@@ -21,12 +21,11 @@ The GUI will ask you to install Python 3.8-3.10, while this is not technically r
 
 Yes, the GUI downloads the latest version of the converter from github.
 
-
-
 ## Compiling
 
 1. Clone the repo
 2. Make your changes
+3. Compile the program with `cargo build --release`
 
 ## Credits
 
