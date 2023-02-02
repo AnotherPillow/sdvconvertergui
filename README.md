@@ -17,6 +17,10 @@ A gui for popular Stardew valley converters
 
 The GUI will ask you to install Python 3.8-3.10, while this is not technically required, it is needed for all the current converters. If you already have Python installed, you can skip this step.
 
+## Known Issues/Constraints
+
+- All JSON files must be json5 (no trailing commas, no comments)
+
 ## Are the converters the latest version?
 
 Yes, the GUI downloads the latest version of the converter from github.
@@ -29,4 +33,4 @@ Yes, the GUI downloads the latest version of the converter from github.
 
 ## Credits
 
-These converters were not made by me, I do not distribute their source code, and I do not claim to own them. I am simply providing a gui for them. I have of course gotten permission to made this.
+These converters were not made by me, I do not distribute their source code, and I do not claim to own them (except for [TMXL2CP](https://github.com/anotherpillow/TMXL2CP), which I made). I am simply providing a gui for them. I have of course gotten permission to made this.

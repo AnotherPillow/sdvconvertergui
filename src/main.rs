@@ -235,7 +235,7 @@ impl eframe::App for MyApp {
                 if converter_info["name"].as_str().unwrap() == "CP2AT" {
                     //open config.json file of converter
                     let newconfig = json!({
-                        "mod_folder_path": self.input_folder.clone(),
+                        "mod_folder_path": converter_input_dir.clone(),
                         "keywords": [],
                     }).to_string();
                     let mut config_file = fs::File::create(converter_dir.join("config.json")).unwrap();
