@@ -80,7 +80,7 @@ impl eframe::App for MyApp {
                 "description":"Convert TMXLoader mods to Content Patcher",
                 "input_folder":"TMXL/",
                 "input_mode": "plain",
-                "output_folder":"output/",
+                "output_folder":"CP/",
                 "output_mode": "plain",
                 "main_file":"main.py",
                 "windows_dependencies":"py -m pip install -r requirements.txt",
@@ -273,8 +273,10 @@ impl eframe::App for MyApp {
                 //println!("conv {:?}", conversion.status);
                 let mut convert_output = String::from_utf8_lossy(&conversion.stdout).to_string();
                 //println!("Conversion output: {}", convert_output);
+                let cd_result = &env::current_dir().unwrap();
+                let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\"))));
                 convert_output += "\n";
-                convert_output += format!("You can find your converted mod in the \"{}\" folder", converter_info["output_folder"].as_str().unwrap()).as_str();
+                convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath.display()).as_str();
                 self.output_data = convert_output;
                 
                 
