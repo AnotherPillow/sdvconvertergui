@@ -274,7 +274,7 @@ impl eframe::App for MyApp {
                 let mut convert_output = String::from_utf8_lossy(&conversion.stdout).to_string();
                 //println!("Conversion output: {}", convert_output);
                 let cd_result = &env::current_dir().unwrap();
-                let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\"))));
+                let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\")));
                 convert_output += "\n";
                 convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath.display()).as_str();
                 self.output_data = convert_output;

@@ -1,2 +1,4 @@
 /target
 /converters
+release_extra.py
+/tests
