@@ -74,7 +74,7 @@ impl Default for MyApp {
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let converters = json!({
+        let mut converters = json!({
             "TMXL2CP":{
                 "name":"TMXL2CP",
                 "description":"Convert TMXLoader mods to Content Patcher",
@@ -173,11 +173,18 @@ impl eframe::App for MyApp {
             }
 
             if self.run_converter {
-                let converter_info = &converters[&self.mod_type];
+                let converter_info = &mut converters[&self.mod_type];
                 println!("Mod type: {}", self.mod_type);
                 println!("Converter: {}", converter_info["name"]);
                 println!("Input folder: {}", self.input_folder);
                 println!("Manifest path: {}", self.manifest_path);
+                let input_dir = self.input_folder.clone();
+                let input_file_parent_folder_name = Path::new(&input_dir).parent().unwrap().file_name().unwrap().to_str().unwrap();
+
+                if converter_info["name"] == "CP2AT" {
+                    converter_info["input_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string());
+                    converter_info["output_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string().replace("[CP]", "[AT]"));
+                }
 
                 //load manifest.json
                 let manifest_raw = fs::File::open(self.manifest_path.clone()).expect("file should open read only");
@@ -221,10 +228,11 @@ impl eframe::App for MyApp {
                 }
                 
                 //copy everything from the input dir to the converter's input dir
-                let input_dir = self.input_folder.clone();
+                
                 let converter_input_dir = Path::new(&env::current_dir().unwrap()).join("converters").join(converter_info["branch_file_name"].as_str().unwrap()).join(converter_info["input_folder"].as_str().unwrap());
                 let converter_input_dir_path = converter_input_dir.to_str().unwrap();
                 let converter_dir = Path::new("converters").join(converter_info["branch_file_name"].as_str().unwrap());
+                
                 if !converter_input_dir.exists() {
                     fs::create_dir_all(&converter_input_dir).unwrap();
                 } else {
