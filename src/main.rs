@@ -180,6 +180,7 @@ impl eframe::App for MyApp {
                 println!("Manifest path: {}", self.manifest_path);
                 let input_dir = self.input_folder.clone();
                 let input_file_parent_folder_name = Path::new(&input_dir).parent().unwrap().file_name().unwrap().to_str().unwrap();
+                let manifest_parent = Path::new(&self.manifest_path).parent().unwrap().file_name().unwrap().to_str().unwrap();
 
                 if converter_info["name"] == "CP2AT" {
                     converter_info["input_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string());
@@ -229,10 +230,13 @@ impl eframe::App for MyApp {
                 
                 //copy everything from the input dir to the converter's input dir
                 
+                let cd_result = &env::current_dir().unwrap();
                 let converter_input_dir = Path::new(&env::current_dir().unwrap()).join("converters").join(converter_info["branch_file_name"].as_str().unwrap()).join(converter_info["input_folder"].as_str().unwrap());
                 let converter_input_dir_path = converter_input_dir.to_str().unwrap();
                 let converter_dir = Path::new("converters").join(converter_info["branch_file_name"].as_str().unwrap());
                 
+                //let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\")));
+                let outdir_fullpath_alt = cd_result.join(converter_dir.join(manifest_parent.replace("[CP]", "[AT]")));
                 if !converter_input_dir.exists() {
                     fs::create_dir_all(&converter_input_dir).unwrap();
                 } else {
@@ -245,6 +249,7 @@ impl eframe::App for MyApp {
                     let newconfig = json!({
                         "mod_folder_path": converter_input_dir.clone(),
                         "keywords": [],
+                        "output_folder_path": outdir_fullpath_alt,
                     }).to_string();
                     let mut config_file = fs::File::create(converter_dir.join("config.json")).unwrap();
                     config_file.write_all(newconfig.as_bytes()).unwrap();
@@ -273,10 +278,8 @@ impl eframe::App for MyApp {
                 //println!("conv {:?}", conversion.status);
                 let mut convert_output = String::from_utf8_lossy(&conversion.stdout).to_string();
                 //println!("Conversion output: {}", convert_output);
-                let cd_result = &env::current_dir().unwrap();
-                let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\")));
                 convert_output += "\n";
-                convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath.display()).as_str();
+                convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath_alt.display()).as_str();
                 self.output_data = convert_output;
                 
                 
