@@ -205,7 +205,7 @@ impl eframe::App for MyApp {
                 if converter_info["name"] == "CP2AT" {
                     converter_info["input_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string());
                     converter_info["output_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string().replace("[CP]", "[AT]"));
-                } else if converter_info["name"] == "CP2AT" {
+                } else if converter_info["name"] == "CF2DGA" {
                     converter_info["output_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string().replace("[CF]", "[DGA]"));
                 }
 
