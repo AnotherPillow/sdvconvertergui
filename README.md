@@ -6,6 +6,7 @@ A gui for popular Stardew valley converters
 
 - TMXL2CP by [AnotherPillow](https://github.com/AnotherPillow/TMXL2CP)
 - CP2AT by [holy-the-sea](https://github.com/holy-the-sea/CP2AT)
+- FurnitureConverter (CF2DGA) by [elizabethcd](https://github.com/elizabethcd/FurnitureConverter)
 
 ## How to use
 
@@ -33,4 +34,4 @@ Yes, the GUI downloads the latest version of the converter from github.
 
 ## Credits
 
-These converters were not made by me, I do not distribute their source code, and I do not claim to own them (except for [TMXL2CP](https://github.com/anotherpillow/TMXL2CP), which I made). I am simply providing a gui for them. I have of course gotten permission to made this.
+Most of these converters were not made by me (except for [TMXL2CP](https://github.com/anotherpillow/TMXL2CP), which I made), I do not distribute their source code, and I do not claim to own them. I am simply providing a gui for them. I have of course gotten permission to made this.

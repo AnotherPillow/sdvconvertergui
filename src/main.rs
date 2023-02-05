@@ -106,7 +106,23 @@ impl eframe::App for MyApp {
                 "branch_file_name":"CP2AT-main",
                 "zip_link":"https://github.com/holy-the-sea/CP2AT/archive/refs/heads/main.zip",
                 "author":"holythesea",
-            }
+            },
+            "CF2DGA":{
+                "name":"CF2DGA",
+                "description":"Convert Custom Furniture mods to Dynamic Game Assets",
+                "input_folder":"original/",
+                "input_mode": "plain",
+                "output_folder":"[DGA] Mod to Convert/",
+                "output_mode": "modname",
+                "main_file":"furniture_converter.py",
+                "windows_dependencies":"py -m pip install -r requirements.txt",
+                "linux_dependencies":"python3 -m pip install -r requirements.txt",
+                "url":"https://github.com/elizabethcd/FurnitureConverter",
+                "zip_link":"https://github.com/elizabethcd/FurnitureConverter/archive/refs/heads/main.zip",
+                "author":" elizabethcd",
+                "unique_id_support": "Platonymous.CustomFurniture",
+                "branch_file_name":"FurnitureConverter-main",
+            },  
         });
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("SDV Converter GUI");
@@ -162,6 +178,7 @@ impl eframe::App for MyApp {
                 .show_ui(ui, |ui| {
                     ui.selectable_value(&mut self.mod_type, "TMXL2CP".to_string(), "TMXLoader [To Content Patcher] by AnotherPillow");
                     ui.selectable_value(&mut self.mod_type, "CP2AT".to_string(), "Content Patcher [To Alternate Textures] by holythesea");
+                    ui.selectable_value(&mut self.mod_type, "CF2DGA".to_string(), "Custom Furniture [To Dynamic Game Assets] by elizabethcd");
                 });
             //add a button to choose mod
 
@@ -182,14 +199,17 @@ impl eframe::App for MyApp {
                 let input_file_parent_folder_name = Path::new(&input_dir).parent().unwrap().file_name().unwrap().to_str().unwrap();
                 let manifest_parent = Path::new(&self.manifest_path).parent().unwrap().file_name().unwrap().to_str().unwrap();
 
+                let manifest_raw = fs::File::open(self.manifest_path.clone()).expect("file should open read only");
+                let manifest_json: serde_json::Value = serde_json::from_reader(manifest_raw).expect("file should be proper JSON");
+                
                 if converter_info["name"] == "CP2AT" {
                     converter_info["input_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string());
                     converter_info["output_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string().replace("[CP]", "[AT]"));
+                } else if converter_info["name"] == "CP2AT" {
+                    converter_info["output_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string().replace("[CF]", "[DGA]"));
                 }
 
                 //load manifest.json
-                let manifest_raw = fs::File::open(self.manifest_path.clone()).expect("file should open read only");
-                let manifest_json: serde_json::Value = serde_json::from_reader(manifest_raw).expect("file should be proper JSON");
                 println!("Manifest: {:#}", manifest_json);
 
                 if manifest_json["ContentPackFor"]["UniqueID"] != converter_info["unique_id_support"] {
@@ -235,7 +255,7 @@ impl eframe::App for MyApp {
                 let converter_input_dir_path = converter_input_dir.to_str().unwrap();
                 let converter_dir = Path::new("converters").join(converter_info["branch_file_name"].as_str().unwrap());
                 
-                //let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\")));
+                let outdir_fullpath = cd_result.join(converter_dir.join(converter_info["output_folder"].as_str().unwrap().replace("/", "\\")));
                 let outdir_fullpath_alt = cd_result.join(converter_dir.join(manifest_parent.replace("[CP]", "[AT]")));
                 if !converter_input_dir.exists() {
                     fs::create_dir_all(&converter_input_dir).unwrap();
@@ -269,17 +289,48 @@ impl eframe::App for MyApp {
                 println!("input dir: {} converter input dir: {}", input_dir, converter_input_dir_path);
                     
                 copy_folder(&input_dir, converter_input_dir_path);
+                #[allow(unused_assignments)]
+                let mut convert_output = "".to_string();
+                #[warn(unused_assignments)]
                 
-                let conversion = Command::new(self.py_cmd.clone())
-                    .arg(converter_info["main_file"].as_str().unwrap())
-                    .current_dir(converter_dir.clone())
-                    .output()
-                    .expect("failed to execute process");
+                if converter_info["name"].as_str().unwrap() == "CF2DGA" {
+                    let conversion = Command::new(self.py_cmd.clone())
+                        .arg(converter_info["main_file"].as_str().unwrap())
+                        .arg("--modName")
+                        .arg(format!("\"{}\"", manifest_json["Name"].as_str().unwrap()).as_str())
+                        .current_dir(converter_dir.clone())
+                        .output()
+                        .expect("failed to execute process");
+                    convert_output = String::from_utf8_lossy(&conversion.stdout).to_string();
+                    //convert_output += format!("\n{} {} --modName \"{}\"\n", self.py_cmd, converter_info["main_file"].as_str().unwrap(), manifest_json["Name"].as_str().unwrap()).as_str();
+                    //if theer's an error, add it to the output
+                    if conversion.status.code().unwrap() != 0 {
+                        convert_output += "\nAn error occured while converting the mod.\n";
+                        convert_output += String::from_utf8_lossy(&conversion.stderr).to_string().as_str();
+                    }
+                } else {
+                    let conversion = Command::new(self.py_cmd.clone())
+                        .arg(converter_info["main_file"].as_str().unwrap())
+                        .current_dir(converter_dir.clone())
+                        .output()
+                        .expect("failed to execute process");
+                    convert_output = String::from_utf8_lossy(&conversion.stdout).to_string();
+
+                    if conversion.status.code().unwrap() != 0 {
+                        convert_output += "\nAn error occured while converting the mod.\n";
+                        convert_output += String::from_utf8_lossy(&conversion.stderr).to_string().as_str();
+                    }
+                }
+
+                    
                 //println!("conv {:?}", conversion.status);
-                let mut convert_output = String::from_utf8_lossy(&conversion.stdout).to_string();
                 //println!("Conversion output: {}", convert_output);
                 convert_output += "\n";
-                convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath_alt.display()).as_str();
+                if converter_info["name"].as_str().unwrap() == "TMXL2CP" {
+                    convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath.display()).as_str();
+                } else {
+                    convert_output += format!("You can find your converted mod in the \"{}\" folder", outdir_fullpath_alt.display()).as_str();
+                }
                 self.output_data = convert_output;
                 
                 
