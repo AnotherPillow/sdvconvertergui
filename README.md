@@ -20,7 +20,7 @@ The GUI will ask you to install Python 3.8-3.10, while this is not technically r
 
 ## Known Issues/Constraints
 
-- All JSON files must be json5 (no trailing commas, no comments)
+- All JSON files must not be json5 (no trailing commas, no comments)
 
 ## Are the converters the latest version?
 
