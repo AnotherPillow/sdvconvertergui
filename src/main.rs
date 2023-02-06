@@ -1,9 +1,11 @@
 //#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use std::fs;
-use std::io;
+use std::fs::File;
+use std::io::{self, Read};
+use unicode_bom::Bom;
 use std::env;
-use std::io::Write;
+use std::io::{Write,BufReader};
 use std::process::Command;
 use std::path::Path;
 use eframe::egui;
@@ -200,7 +202,25 @@ impl eframe::App for MyApp {
                 let manifest_parent = Path::new(&self.manifest_path).parent().unwrap().file_name().unwrap().to_str().unwrap();
 
                 let manifest_raw = fs::File::open(self.manifest_path.clone()).expect("file should open read only");
-                let manifest_json: serde_json::Value = serde_json::from_reader(manifest_raw).expect("file should be proper JSON");
+                #[allow(unused_assignments)]
+                let mut manifest_json = json!({});
+                #[warn(unused_assignments)]
+
+                //attempt to run manifest_json = serde_json::from_reader(manifest_raw).expect("file should be proper JSON");, if it fails, run different code
+                match serde_json::from_reader(manifest_raw) {
+                    Ok(v) => manifest_json = v,
+                    Err(_) => {
+                        let bom = getbom(&self.manifest_path);
+                        let file = File::open(&self.manifest_path).unwrap();
+                        let mut reader = BufReader::new(file);
+                        if bom != Bom::Null {
+                            let mut x = [0; 3];
+                            let _y = reader.read_exact(&mut x);
+                        }
+                        //parse the manifest
+                        manifest_json = serde_json::from_reader(reader).expect("file should be proper JSON");
+                    }
+                }
                 
                 if converter_info["name"] == "CP2AT" {
                     converter_info["input_folder"] = serde_json::Value::String(input_file_parent_folder_name.to_string());
@@ -426,4 +446,8 @@ fn copy_folder(src: &str, dest: &str) {
             copy_folder(path.to_str().unwrap(), dest.join(file_name).to_str().unwrap());
         }
     }
+}
+fn getbom(path: &str) -> Bom {
+    let mut file = File::open(path).unwrap();
+    Bom::from(&mut file)
 }
