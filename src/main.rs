@@ -20,7 +20,6 @@ use zip::ZipArchive;
 //         .add_filter("rust", &["rs", "toml"])
 //         .set_directory("/")
 //         .pick_file();
-//use std::error::Error;
 
 fn main()  {
     if std::path::Path::new("converters/").exists() {
@@ -356,11 +355,6 @@ impl eframe::App for MyApp {
                 
                 
                 self.converter_complete = true;
-
-                
-
-
-
                 
                 self.run_converter = false;
             }
@@ -389,7 +383,7 @@ impl eframe::App for MyApp {
                 }
             }
             if self.manifest_notif {
-                ui.label("You didn't select a manifest.json file, please select a manifest.json file.");
+                ui.label("That is not a manifest.json, please select a manifest.json file.");
                 if ui.button("Ok").clicked() {
                     self.manifest_notif = false;
                 }

@@ -2,3 +2,4 @@
 /converters
 release_extra.py
 /tests
+.cargo
