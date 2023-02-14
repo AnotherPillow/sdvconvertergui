@@ -2085,7 +2085,7 @@ dependencies = [
 
 [[package]]
 name = "sdvconvertergui"
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
  "eframe",
  "reqwest",
