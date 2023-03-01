@@ -2,6 +2,9 @@
 
 A gui for popular Stardew valley converters
 
+![img](https://img.shields.io/github/release/anotherpillow/sdvconvertergui.svg)
+![img](https://img.shields.io/github/downloads/anotherpillow/sdvconvertergui/total.svg)
+
 ## Supported converters
 
 - TMXL2CP by [AnotherPillow](https://github.com/AnotherPillow/TMXL2CP)
