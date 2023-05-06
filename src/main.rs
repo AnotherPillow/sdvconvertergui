@@ -130,7 +130,7 @@ impl eframe::App for MyApp {
             ui.separator();
 
             if self.check_py {
-                let py_versions = ["Python 3.8", "Python 3.9", "Python 3.10"];
+                let py_versions = ["Python 3.8", "Python 3.9", "Python 3.10", "Python 3.11"];
                 let operating_sys = env::consts::OS;
                 if operating_sys == "windows" {
                     let output = Command::new("py")
@@ -141,8 +141,8 @@ impl eframe::App for MyApp {
                     self.py_cmd = "py".to_string();
                     println!("Python installed version: {}", output);
                     if !py_versions.iter().any(|&x| output.contains(x)) {
-                        ui.label("Python 3.8, 3.9, or 3.10 is not installed!");
-                        ui.label("Please install Python 3.8, 3.9, or 3.10 to use this program! https://www.python.org/downloads/");
+                        ui.label("Python 3.8, 3.9, 3.10 or 3.11 is not installed!");
+                        ui.label("Please install Python 3.8, 3.9, 3.10 or 3.11 to use this program! https://www.python.org/downloads/");
                         if ui.button("Ok").clicked() {
                             self.check_py = false;
                         }
@@ -159,7 +159,7 @@ impl eframe::App for MyApp {
                     self.py_cmd = "python3".to_string();
                     if !py_versions.iter().any(|&x| x.contains(&*output)) {
                         ui.label("Python 3.8, 3.9, or 3.10 is not installed!");
-                        ui.label("Please install Python 3.8, 3.9, or 3.10 to use this program! https://www.python.org/downloads/");
+                        ui.label("Please install Python 3.8, 3.9, 3.10 or 3.11 to use this program! https://www.python.org/downloads/");
                         if ui.button("Ok").clicked() {
                             self.check_py = false;
                         }
