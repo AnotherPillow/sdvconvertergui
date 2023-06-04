@@ -1,3 +1,4 @@
+//#![feature(try_blocks)]
 //#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use std::fs;
@@ -9,6 +10,7 @@ use std::io::{Write,BufReader};
 use std::process::Command;
 use std::path::Path;
 use eframe::egui;
+use egui::RichText;
 use reqwest::blocking::Client;
 use tracing_subscriber;
 use serde_json::json;
@@ -20,6 +22,7 @@ use zip::ZipArchive;
 //         .add_filter("rust", &["rs", "toml"])
 //         .set_directory("/")
 //         .pick_file();
+
 
 fn main()  {
     if std::path::Path::new("converters/").exists() {
@@ -54,6 +57,7 @@ struct MyApp {
     check_py: bool,
     py_cmd: String,
     converter_complete: bool,
+    py_installed: bool,
 }
 
 impl Default for MyApp {
@@ -69,6 +73,7 @@ impl Default for MyApp {
             check_py: true,
             py_cmd: "".to_string(),
             converter_complete:false,
+            py_installed: false,
         }
     }
 }
@@ -91,6 +96,7 @@ impl eframe::App for MyApp {
                 "author":"AnotherPillow",
                 "unique_id_support": "Platonymous.TMXLoader",
                 "branch_file_name":"TMXL2CP-main",
+                "language": "python",
             },
             "CP2AT":{
                 "name":"CP2AT",
@@ -107,6 +113,7 @@ impl eframe::App for MyApp {
                 "branch_file_name":"CP2AT-main",
                 "zip_link":"https://github.com/holy-the-sea/CP2AT/archive/refs/heads/main.zip",
                 "author":"holythesea",
+                "language": "python",
             },
             "CF2DGA":{
                 "name":"CF2DGA",
@@ -123,6 +130,7 @@ impl eframe::App for MyApp {
                 "author":" elizabethcd",
                 "unique_id_support": "Platonymous.CustomFurniture",
                 "branch_file_name":"FurnitureConverter-main",
+                "language": "python",
             },  
         });
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -133,16 +141,47 @@ impl eframe::App for MyApp {
                 let py_versions = ["Python 3.8", "Python 3.9", "Python 3.10", "Python 3.11"];
                 let operating_sys = env::consts::OS;
                 if operating_sys == "windows" {
-                    let output = Command::new("py")
+                    let mut output = "".to_string();
+                    
+                    
+                    let raw_cmd = Command::new("py")
                         .arg("--version")
-                        .output()
-                        .expect("failed to execute process");
-                    let output = String::from_utf8_lossy(&output.stdout);
+                        .output();
+                        //.expect("failed to execute process");
+
+                    let mut getoutput = true;
+                    
+                    //check if it errors, BUT DO NOT CLOSE THE PROGRAM IF IT DOES
+                    match raw_cmd {
+                        Ok(c) => {
+                            output = String::from_utf8_lossy(&c.stdout).to_string();
+                            self.py_installed = true;
+                            //self.check_py = false;
+                        }
+                        Err(_e) => {
+                            //println!("Error: {}", e);
+                            self.py_installed = false;
+                            //self.check_py = false;
+                            
+                            
+                            getoutput = false;
+                            
+        
+                        }
+                    };
+
+                    // if getoutput {
+                    //     output = String::from_utf8_lossy(&cmd.stdout).to_string();
+                    //     self.py_installed = true;
+                    // }
+
+                    
+                    
                     self.py_cmd = "py".to_string();
-                    println!("Python installed version: {}", output);
-                    if !py_versions.iter().any(|&x| output.contains(x)) {
+                    //println!("Python installed version: {}", output);
+                    if !py_versions.iter().any(|&x| output.contains(x)) || !self.py_installed {
                         ui.label("Python 3.8, 3.9, 3.10 or 3.11 is not installed!");
-                        ui.label("Please install Python 3.8, 3.9, 3.10 or 3.11 to use this program! https://www.python.org/downloads/");
+                        ui.label("Please install Python 3.8, 3.9, 3.10 or 3.11 to use converters which require Python! https://www.python.org/downloads/");
                         if ui.button("Ok").clicked() {
                             self.check_py = false;
                         }
@@ -170,16 +209,19 @@ impl eframe::App for MyApp {
             }
             //have a box to select a folder
             ui.label("Select a folder to convert");
-            
+            //ui.label(RichText::new("Striked").strikethrough());
+           
 
 
             egui::ComboBox::from_id_source("mod_type")
                 .selected_text(&self.mod_type)
                 .width(200.0)
                 .show_ui(ui, |ui| {
-                    ui.selectable_value(&mut self.mod_type, "TMXL2CP".to_string(), "TMXLoader [To Content Patcher] by AnotherPillow");
-                    ui.selectable_value(&mut self.mod_type, "CP2AT".to_string(), "Content Patcher [To Alternate Textures] by holythesea");
-                    ui.selectable_value(&mut self.mod_type, "CF2DGA".to_string(), "Custom Furniture [To Dynamic Game Assets] by elizabethcd");
+                    if self.py_installed {
+                        ui.selectable_value(&mut self.mod_type, "TMXL2CP".to_string(), "TMXLoader [To Content Patcher] by AnotherPillow");
+                        ui.selectable_value(&mut self.mod_type, "CP2AT".to_string(), "Content Patcher [To Alternate Textures] by holythesea");
+                        ui.selectable_value(&mut self.mod_type, "CF2DGA".to_string(), "Custom Furniture [To Dynamic Game Assets] by elizabethcd");
+                    }   
                 });
             //add a button to choose mod
 
@@ -191,6 +233,9 @@ impl eframe::App for MyApp {
             }
 
             if self.run_converter {
+                if self.mod_type == "Needs Python".to_string() {
+                    return;
+                }
                 let converter_info = &mut converters[&self.mod_type];
                 println!("Mod type: {}", self.mod_type);
                 println!("Converter: {}", converter_info["name"]);
