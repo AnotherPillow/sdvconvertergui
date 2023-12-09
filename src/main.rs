@@ -138,7 +138,7 @@ impl eframe::App for MyApp {
             ui.separator();
 
             if self.check_py {
-                let py_versions = ["Python 3.8", "Python 3.9", "Python 3.10", "Python 3.11"];
+                let py_versions = ["Python 3.8", "Python 3.9", "Python 3.10", "Python 3.11", "Python 3.12"];
                 let operating_sys = env::consts::OS;
                 if operating_sys == "windows" {
                     let mut output = "".to_string();
@@ -180,8 +180,8 @@ impl eframe::App for MyApp {
                     self.py_cmd = "py".to_string();
                     //println!("Python installed version: {}", output);
                     if !py_versions.iter().any(|&x| output.contains(x)) || !self.py_installed {
-                        ui.label("Python 3.8, 3.9, 3.10 or 3.11 is not installed!");
-                        ui.label("Please install Python 3.8, 3.9, 3.10 or 3.11 to use converters which require Python! https://www.python.org/downloads/");
+                        ui.label("Python 3.8, 3.9, 3.10, 3.11 or 3.12 is not installed!");
+                        ui.label("Please install Python 3.8, 3.9, 3.10, 3.11 or 3.12 to use converters which require Python! https://www.python.org/downloads/");
                         if ui.button("Ok").clicked() {
                             self.check_py = false;
                         }
