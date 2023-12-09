@@ -69,7 +69,7 @@ impl Default for MyApp {
             input_folder: "".to_string(),
             run_converter: false,
             compat_notif: false,
-            output_data: "Run a converter to see it's output!".to_string(),
+            output_data: "Run a converter to see its output!".to_string(),
             check_py: true,
             py_cmd: "".to_string(),
             converter_complete:false,
