@@ -19,7 +19,7 @@ A gui for popular Stardew valley converters
 
 ## Dependencies
 
-The GUI will ask you to install Python 3.8-3.10, while this is not technically required, it is needed for all the current converters. If you already have Python installed, you can skip this step.
+The GUI will ask you to install Python 3.8-3.12, while this is not technically required, it is needed for all the current converters. If you already have Python installed, you can skip this step.
 
 ## Known Issues/Constraints
 
