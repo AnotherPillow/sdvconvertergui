@@ -1,3 +1,7 @@
+# DEPRECATED - PLEASE US SDVCONVERTERGUI2
+
+[sdvconvertergui2](https://github.com/anotherpillow/sdvconvertergui2)
+
 # sdvconvertergui
 
 A gui for popular Stardew valley converters
